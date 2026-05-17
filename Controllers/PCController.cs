@@ -1,4 +1,5 @@
-﻿using EFCodeFirstTask1.Infrastructure;
+﻿using EFCodeFirstTask1.DTOs;
+using EFCodeFirstTask1.Infrastructure;
 using EFCodeFirstTask1.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,35 +18,35 @@ namespace EFCodeFirstTask1.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<PC>>> GetPCs()
+        public async Task<ActionResult<List<PCResultDTO>>> GetPCs()
         {
             var PCs = await _context.PCs
-                .Select(p => new
+                .Select(p => new PCResultDTO
                 {
-                    p.Id,
-                    p.Name,
-                    p.Weight,
-                    p.Warranty,
-                    p.CreatedAt,
-                    p.Stock
+                    Id = p.Id,
+                    Name = p.Name,
+                    Weight = p.Weight,
+                    Warranty = p.Warranty,
+                    CreatedAt = p.CreatedAt,
+                    Stock = p.Stock
                 }).ToListAsync();
             return Ok(PCs);
         }
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<ActionResult<PC>> GetPC(int id)
+        public async Task<ActionResult<PCResultDTO>> GetPC(int id)
         {
             var PC = await _context.PCs
                 .Where(p => p.Id == id)
-                .Select(p => new
+                .Select(p => new PCResultDTO
                 {
-                    p.Id,
-                    p.Name,
-                    p.Weight,
-                    p.Warranty,
-                    p.CreatedAt,
-                    p.Stock
+                    Id = p.Id,
+                    Name = p.Name,
+                    Weight = p.Weight,
+                    Warranty = p.Warranty,
+                    CreatedAt = p.CreatedAt,
+                    Stock = p.Stock
                 }).FirstOrDefaultAsync();
 
             if (PC is null)
@@ -69,10 +70,20 @@ namespace EFCodeFirstTask1.Controllers
                     pc => pc.ComponentCode,
                     c => c.Code,
                     (pc, c) => new { PCComp = pc, Compo = c })
-                .Select(v => new
+                .Join(_context.ComponentTypes,
+                    v => v.Compo.ComponentTypeId,
+                    ct => ct.Id,
+                    (v, ct) => new { v.PCComp, v.Compo, CompType = ct })
+                .Join(_context.ComponentManufacturers,
+                    v => v.Compo.ComponentManufacturerId,
+                    m => m.Id,
+                    (v, m) => new { v.PCComp, v.Compo, v.CompType, CompManu = m })
+                .Select(v => new ComponentResultDTO
                 {
                     Code = v.Compo.Code,
                     Name = v.Compo.Name,
+                    Type = v.CompType.Name,
+                    Manufacturer = v.CompManu.Abbreviation,
                     Description = v.Compo.Description,
                     Amount = v.PCComp.Amount
                 }).ToListAsync();
