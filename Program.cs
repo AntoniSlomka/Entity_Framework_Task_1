@@ -1,4 +1,6 @@
 using EFCodeFirstTask1.Infrastructure;
+using EFCodeFirstTask1.Repository;
+using EFCodeFirstTask1.Service;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +16,8 @@ builder.Services.AddDbContext<DatabaseContext>(opt =>
 {
     opt.UseSqlServer(builder.Configuration.GetConnectionString("Default"));
 });
+builder.Services.AddScoped<IRepository, Repository>();
+builder.Services.AddScoped<IPCService, PCService>();
 
 
 var app = builder.Build();

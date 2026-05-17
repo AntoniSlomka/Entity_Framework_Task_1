@@ -4,6 +4,8 @@ using EFCodeFirstTask1.Models;
 using EFCodeFirstTask1.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.IdentityModel.Tokens;
 
 namespace EFCodeFirstTask1.Controllers
 {
@@ -44,6 +46,24 @@ namespace EFCodeFirstTask1.Controllers
                 return NotFound($"PC with id {id} was not found.");
 
             return Ok(await _service.GetPCComponents(id));
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<PCResultDTO>> CreatePC(PCCreateDTO request)
+        {
+            var pc = await _service.AddPC(request);
+
+            return CreatedAtAction(nameof(GetPC), new { pc.Id }, pc);
+        }
+
+        [HttpPut]
+        [Route("/{id}")]
+        public async Task<ActionResult<PCResultDTO>> UpdatePC(int id, PCUpdateDTO request)
+        {
+            var pc = _service.UpdatePC(id, request);
+            if (pc is null) return NotFound($"PC with id {id} was not found.");
+
+            return Ok(pc);
         }
 
     }

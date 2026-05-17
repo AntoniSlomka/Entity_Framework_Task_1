@@ -5,26 +5,36 @@ namespace EFCodeFirstTask1.Service
 {
     public class PCService : IPCService
     {
-        private readonly IRepository repository;
+        private readonly IRepository _repository;
 
         public PCService(IRepository repository)
         {
-            this.repository = repository;
+            this._repository = repository;
         }
 
         public async Task<List<PCResultDTO>> GetPCs()
         {
-            return await repository.GetPCs();
+            return await _repository.GetPCs();
         }
 
         public async Task<PCResultDTO> GetPC(int id)
         {
-            return await repository.GetPC(id);
+            return await _repository.GetPC(id);
         }
 
         public async Task<List<ComponentResultDTO>> GetPCComponents(int id)
         {
-            return await repository.GetPCComponents(id);
+            return await _repository.GetPCComponents(id);
+        }
+
+        public async Task<PCResultDTO> AddPC(PCCreateDTO request)
+        {
+            return await _repository.AddPC(request);
+        }
+
+        public async Task<PCResultDTO> UpdatePC(int id, PCUpdateDTO request)
+        {
+            return await _repository.UpdatePC(id, request);
         }
     }
 }

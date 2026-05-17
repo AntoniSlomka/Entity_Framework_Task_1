@@ -1,8 +1,7 @@
 ﻿using EFCodeFirstTask1.DTOs;
 using EFCodeFirstTask1.Infrastructure;
-using EFCodeFirstTask1.Service;
-using Microsoft.AspNetCore.Mvc;
-using System.Data.Entity;
+using EFCodeFirstTask1.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace EFCodeFirstTask1.Repository
 {
@@ -74,6 +73,58 @@ namespace EFCodeFirstTask1.Repository
                 }).ToListAsync();
 
             return Components;
+        }
+
+        public async Task<PCResultDTO> AddPC(PCCreateDTO request)
+        {
+            var pc = new PC
+            {
+                Name = request.Name,
+                Weight = request.Weight,
+                Warranty = request.Warranty,
+                CreatedAt = request.CreatedAt,
+                Stock = request.Stock
+            };
+
+            _context.PCs.Add(pc);
+            await _context.SaveChangesAsync();
+            return new PCResultDTO
+            {
+                Id = pc.Id,
+                Name = pc.Name,
+                Weight = pc.Weight,
+                Warranty = pc.Warranty,
+                CreatedAt = pc.CreatedAt,
+                Stock = pc.Stock
+            };
+
+        }
+
+        public async Task<PCResultDTO> UpdatePC(int id, PCUpdateDTO request)
+        {
+            var pc = await _context.PCs
+                .Where(p => p.Id == id)
+                .FirstOrDefaultAsync();
+
+            if (pc == null) return null;
+
+            pc.Name = request.Name ?? pc.Name;
+            pc.Weight = request.Weight ?? pc.Weight;
+            pc.Warranty = request.Warranty ?? pc.Warranty;
+            pc.CreatedAt = request.CreatedAt ?? pc.CreatedAt;
+            pc.Stock = request.Stock ?? pc.Stock;
+
+            await _context.SaveChangesAsync();
+
+            return new PCResultDTO
+            {
+                Id = pc.Id,
+                Name = pc.Name,
+                Weight = pc.Weight,
+                Warranty = pc.Warranty,
+                CreatedAt = pc.CreatedAt,
+                Stock = pc.Stock
+            };
         }
 
     }

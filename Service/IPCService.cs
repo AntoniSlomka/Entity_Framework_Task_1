@@ -8,5 +8,9 @@ namespace EFCodeFirstTask1.Service
         Task<PCResultDTO> GetPC(int id);
 
         Task<List<ComponentResultDTO>> GetPCComponents(int id);
+
+        Task<PCResultDTO> AddPC(PCCreateDTO request);
+
+        Task<PCResultDTO> UpdatePC(int id, PCUpdateDTO request);
     }
 }
