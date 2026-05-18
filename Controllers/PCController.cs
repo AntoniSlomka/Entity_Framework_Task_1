@@ -1,4 +1,5 @@
 ﻿using EFCodeFirstTask1.DTOs;
+using EFCodeFirstTask1.Exceptions;
 using EFCodeFirstTask1.Infrastructure;
 using EFCodeFirstTask1.Models;
 using EFCodeFirstTask1.Service;
@@ -30,22 +31,32 @@ namespace EFCodeFirstTask1.Controllers
         [Route("{id}")]
         public async Task<ActionResult<PCResultDTO>> GetPC(int id)
         {
-            var PC = await _service.GetPC(id);
+            try
+            {
+                var PC = await _service.GetPC(id);
 
-            if (PC is null)
-                return NotFound($"PC with id: {id} not found");
-            else
                 return Ok(PC);
+            }
+            catch (NotFoundException e)
+            {
+                return NotFound(e.Message);
+            }
+            
         }
 
         [HttpGet]
         [Route("{id}/components")]
         public async Task<ActionResult<List<ComponentResultDTO>>> GetPCComponents(int id)
         {
-            if (_service.GetPC(id) == null)
-                return NotFound($"PC with id {id} was not found.");
+            try
+            {
+                return Ok(await _service.GetPCComponents(id));
+            }
+            catch (NotFoundException e)
+            {
+                return NotFound(e.Message);
+            }           
 
-            return Ok(await _service.GetPCComponents(id));
         }
 
         [HttpPost]
@@ -60,10 +71,30 @@ namespace EFCodeFirstTask1.Controllers
         [Route("/{id}")]
         public async Task<ActionResult<PCResultDTO>> UpdatePC(int id, PCUpdateDTO request)
         {
-            var pc = _service.UpdatePC(id, request);
-            if (pc is null) return NotFound($"PC with id {id} was not found.");
+            try
+            {
+                var pc = _service.UpdatePC(id, request);
+                return Ok(pc);
+            }
+            catch (NotFoundException e)
+            {
+                return NotFound(e.Message);
+            }            
+        }
 
-            return Ok(pc);
+        [HttpDelete]
+        [Route("/{id}")]
+        public async Task<ActionResult> DeletePC(int id)
+        {
+            try
+            {
+                await _service.DeletePc(id);
+            }
+            catch (NotFoundException e)
+            {
+                return NotFound(e.Message);
+            }
+            return NoContent();
         }
 
     }

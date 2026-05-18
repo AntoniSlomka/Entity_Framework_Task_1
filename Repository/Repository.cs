@@ -1,4 +1,5 @@
 ﻿using EFCodeFirstTask1.DTOs;
+using EFCodeFirstTask1.Exceptions;
 using EFCodeFirstTask1.Infrastructure;
 using EFCodeFirstTask1.Models;
 using Microsoft.EntityFrameworkCore;
@@ -42,12 +43,18 @@ namespace EFCodeFirstTask1.Repository
                     CreatedAt = p.CreatedAt,
                     Stock = p.Stock
                 }).FirstOrDefaultAsync();
-
+            if (PC == null) throw new NotFoundException($"Pc with id: {id} not found");
             return PC;
         }
 
         public async Task<List<ComponentResultDTO>> GetPCComponents(int id)
         {
+            var PC = await _context.PCs
+                .Where(p => p.Id == id)
+                .FirstOrDefaultAsync();
+
+            if (PC is null) throw new NotFoundException($"Pc with id: {id} not found");
+
             var Components = await _context.PCComponents
                 .Where(pc => pc.PCId == id)
                 .Join(_context.Components,
@@ -106,7 +113,7 @@ namespace EFCodeFirstTask1.Repository
                 .Where(p => p.Id == id)
                 .FirstOrDefaultAsync();
 
-            if (pc == null) return null;
+            if (pc == null) throw new NotFoundException($"Pc with id: {id} not found");
 
             pc.Name = request.Name ?? pc.Name;
             pc.Weight = request.Weight ?? pc.Weight;
@@ -125,6 +132,16 @@ namespace EFCodeFirstTask1.Repository
                 CreatedAt = pc.CreatedAt,
                 Stock = pc.Stock
             };
+        }
+
+        public async Task DeletePC(int id)
+        {
+            var PC = await _context.PCs
+                .Where(p => p.Id == id)
+                .FirstOrDefaultAsync();
+            if (PC == null) throw new NotFoundException($"Pc with id: {id} not found");
+            _context.PCs.Remove(PC);
+            await _context.SaveChangesAsync();
         }
 
     }

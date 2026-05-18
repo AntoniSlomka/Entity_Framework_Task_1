@@ -58,7 +58,8 @@ namespace EFCodeFirstTask1.Infrastructure
             modelBuilder.Entity<PCComponent>()
                 .HasOne(p => p.PC)
                 .WithMany(pc => pc.PCComponents)
-                .HasForeignKey(p => p.PCId);
+                .HasForeignKey(p => p.PCId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<PCComponent>()
                 .HasOne(p => p.Component)

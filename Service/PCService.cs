@@ -36,5 +36,10 @@ namespace EFCodeFirstTask1.Service
         {
             return await _repository.UpdatePC(id, request);
         }
+
+        public async Task DeletePc(int id)
+        {
+            await _repository.DeletePC(id);
+        }
     }
 }

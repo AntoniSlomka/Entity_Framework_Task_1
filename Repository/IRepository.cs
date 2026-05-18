@@ -14,5 +14,7 @@ namespace EFCodeFirstTask1.Repository
         Task<PCResultDTO> AddPC(PCCreateDTO request);
 
         Task<PCResultDTO> UpdatePC(int id, PCUpdateDTO request);
+
+        Task DeletePC(int id);
     }
 }
